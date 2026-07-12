@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TBank\Payments\DTO\Request;
 
 /** Запрос AddCustomer — регистрация покупателя. */
-final readonly class AddCustomerRequestDto
+final readonly class AddCustomerRequestDto extends BaseRequestDto
 {
     public function __construct(
         public string $customerKey,
@@ -17,18 +17,11 @@ final readonly class AddCustomerRequestDto
     /** @return array<string, mixed> */
     public function toArray(): array
     {
-        $params = ['CustomerKey' => $this->customerKey];
-
-        if ($this->ip !== null) {
-            $params['IP'] = $this->ip;
-        }
-        if ($this->email !== null) {
-            $params['Email'] = $this->email;
-        }
-        if ($this->phone !== null) {
-            $params['Phone'] = $this->phone;
-        }
-
-        return $params;
+        return $this->filterNulls([
+            'CustomerKey' => $this->customerKey,
+            'IP'          => $this->ip,
+            'Email'       => $this->email,
+            'Phone'       => $this->phone,
+        ]);
     }
 }

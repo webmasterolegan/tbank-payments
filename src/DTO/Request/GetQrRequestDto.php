@@ -7,7 +7,7 @@ namespace TBank\Payments\DTO\Request;
 use TBank\Payments\Enum\QrDataTypeEnum;
 
 /** Запрос GetQr — формирование QR для оплаты через СБП. */
-final readonly class GetQrRequestDto
+final readonly class GetQrRequestDto extends BaseRequestDto
 {
     public function __construct(
         public string $paymentId,
@@ -18,15 +18,10 @@ final readonly class GetQrRequestDto
     /** @return array<string, mixed> */
     public function toArray(): array
     {
-        $params = [
+        return $this->filterNulls([
             'PaymentId' => $this->paymentId,
             'DataType'  => $this->dataType->value,
-        ];
-
-        if ($this->bankId !== null) {
-            $params['BankId'] = $this->bankId;
-        }
-
-        return $params;
+            'BankId'    => $this->bankId,
+        ]);
     }
 }

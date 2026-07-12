@@ -41,7 +41,7 @@ final class RetryingHttpClient implements HttpClientContract
                     throw $e;
                 }
 
-                usleep($this->delayMs * 1000 * $attempt);
+                usleep((int) ($this->delayMs * 1000 * (2 ** ($attempt - 1))));
             }
         }
     }

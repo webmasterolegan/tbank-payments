@@ -9,7 +9,7 @@ use TBank\Payments\DTO\Shared\ReceiptDto;
 /**
  * Запрос Cancel — отмена / частичный возврат платежа.
  */
-final readonly class CancelRequestDto
+final readonly class CancelRequestDto extends BaseRequestDto
 {
     public function __construct(
         public string $paymentId,
@@ -22,15 +22,10 @@ final readonly class CancelRequestDto
     /** @return array<string, mixed> */
     public function toArray(): array
     {
-        $params = ['PaymentId' => $this->paymentId];
-
-        if ($this->amount !== null) {
-            $params['Amount'] = $this->amount;
-        }
-        if ($this->receipt !== null) {
-            $params['Receipt'] = $this->receipt->toArray();
-        }
-
-        return $params;
+        return $this->filterNulls([
+            'PaymentId' => $this->paymentId,
+            'Amount'    => $this->amount,
+            'Receipt'   => $this->receipt?->toArray(),
+        ]);
     }
 }

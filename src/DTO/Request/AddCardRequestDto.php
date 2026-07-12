@@ -7,7 +7,7 @@ namespace TBank\Payments\DTO\Request;
 use TBank\Payments\Enum\CardCheckTypeEnum;
 
 /** Запрос AddCard — инициировать привязку карты. */
-final readonly class AddCardRequestDto
+final readonly class AddCardRequestDto extends BaseRequestDto
 {
     public function __construct(
         public string $customerKey,
@@ -21,24 +21,13 @@ final readonly class AddCardRequestDto
     /** @return array<string, mixed> */
     public function toArray(): array
     {
-        $params = [
-            'CustomerKey' => $this->customerKey,
-            'CheckType'   => $this->checkType->value,
-        ];
-
-        if ($this->description !== null) {
-            $params['Description'] = $this->description;
-        }
-        if ($this->notificationUrl !== null) {
-            $params['NotificationURL'] = $this->notificationUrl;
-        }
-        if ($this->successUrl !== null) {
-            $params['SuccessURL'] = $this->successUrl;
-        }
-        if ($this->failUrl !== null) {
-            $params['FailURL'] = $this->failUrl;
-        }
-
-        return $params;
+        return $this->filterNulls([
+            'CustomerKey'     => $this->customerKey,
+            'CheckType'       => $this->checkType->value,
+            'Description'     => $this->description,
+            'NotificationURL' => $this->notificationUrl,
+            'SuccessURL'      => $this->successUrl,
+            'FailURL'         => $this->failUrl,
+        ]);
     }
 }

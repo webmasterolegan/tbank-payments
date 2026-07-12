@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TBank\Payments\DTO\Request;
 
 /** Запрос RemoveCard — удалить привязанную карту. */
-final readonly class RemoveCardRequestDto
+final readonly class RemoveCardRequestDto extends BaseRequestDto
 {
     public function __construct(
         public string $customerKey,

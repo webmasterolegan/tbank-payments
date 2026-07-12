@@ -7,7 +7,7 @@ namespace TBank\Payments\DTO\Request;
 use TBank\Payments\Enum\NotificationTypeEnum;
 
 /** Запрос Resend — повторная отправка неотправленных уведомлений. */
-final readonly class ResendRequestDto
+final readonly class ResendRequestDto extends BaseRequestDto
 {
     public function __construct(
         public ?string $paymentId = null,
@@ -17,15 +17,9 @@ final readonly class ResendRequestDto
     /** @return array<string, mixed> */
     public function toArray(): array
     {
-        $params = [];
-
-        if ($this->paymentId !== null) {
-            $params['PaymentId'] = $this->paymentId;
-        }
-        if ($this->notificationType !== null) {
-            $params['NotificationTypes'] = $this->notificationType->value;
-        }
-
-        return $params;
+        return $this->filterNulls([
+            'PaymentId'         => $this->paymentId,
+            'NotificationTypes' => $this->notificationType?->value,
+        ]);
     }
 }

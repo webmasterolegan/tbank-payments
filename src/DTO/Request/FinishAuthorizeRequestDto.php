@@ -7,7 +7,7 @@ namespace TBank\Payments\DTO\Request;
 /**
  * Запрос FinishAuthorize — передача карточных данных или результата 3DS.
  */
-final readonly class FinishAuthorizeRequestDto
+final readonly class FinishAuthorizeRequestDto extends BaseRequestDto
 {
     public function __construct(
         public string $paymentId,
@@ -24,21 +24,12 @@ final readonly class FinishAuthorizeRequestDto
     /** @return array<string, mixed> */
     public function toArray(): array
     {
-        $params = ['PaymentId' => $this->paymentId];
-
-        if ($this->cardData !== null) {
-            $params['CardData'] = $this->cardData;
-        }
-        if ($this->encryptedPaymentData !== null) {
-            $params['EncryptedPaymentData'] = $this->encryptedPaymentData;
-        }
-        if ($this->md !== null) {
-            $params['MD'] = $this->md;
-        }
-        if ($this->paRes !== null) {
-            $params['PaRes'] = $this->paRes;
-        }
-
-        return $params;
+        return $this->filterNulls([
+            'PaymentId'            => $this->paymentId,
+            'CardData'             => $this->cardData,
+            'EncryptedPaymentData' => $this->encryptedPaymentData,
+            'MD'                   => $this->md,
+            'PaRes'                => $this->paRes,
+        ]);
     }
 }

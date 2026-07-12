@@ -15,6 +15,10 @@ final readonly class WebhookNotificationDto
 
     /**
      * @param array<string, mixed> $raw Полный payload после проверки подписи.
+     *
+     * @warning Поле $raw может содержать чувствительные данные: Pan, ExpDate, CardId,
+     *          AccountToken. Не передавайте его в логи напрямую — используйте
+     *          {@see rawRedacted()} или {@see withoutSensitiveData()} перед логированием.
      */
     public function __construct(
         public string $terminalKey,
@@ -32,6 +36,7 @@ final readonly class WebhookNotificationDto
         public ?string $requestKey = null,
         public ?string $errorCode = null,
         public ?string $message = null,
+        /** @see rawRedacted() для безопасного логирования без чувствительных данных */
         public array $raw = [],
     ) {}
 

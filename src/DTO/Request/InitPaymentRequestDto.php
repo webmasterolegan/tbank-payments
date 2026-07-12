@@ -12,7 +12,7 @@ use TBank\Payments\Enum\{LanguageEnum, PayTypeEnum};
  *
  * @see https://developer.tbank.ru/eacq/api/init
  */
-final readonly class InitPaymentRequestDto
+final readonly class InitPaymentRequestDto extends BaseRequestDto
 {
     /**
      * @param array<string,string> $data Дополнительные данные (DATA).
@@ -35,42 +35,19 @@ final readonly class InitPaymentRequestDto
     /** @return array<string, mixed> */
     public function toArray(): array
     {
-        $params = [
-            'Amount'  => $this->amount,
-            'OrderId' => $this->orderId,
-        ];
-
-        if ($this->description !== null) {
-            $params['Description'] = $this->description;
-        }
-        if ($this->customerKey !== null) {
-            $params['CustomerKey'] = $this->customerKey;
-        }
-        if ($this->recurrent) {
-            $params['Recurrent'] = 'Y';
-        }
-        if ($this->payType !== null) {
-            $params['PayType'] = $this->payType->value;
-        }
-        if ($this->language !== null) {
-            $params['Language'] = $this->language->value;
-        }
-        if ($this->notificationUrl !== null) {
-            $params['NotificationURL'] = $this->notificationUrl;
-        }
-        if ($this->successUrl !== null) {
-            $params['SuccessURL'] = $this->successUrl;
-        }
-        if ($this->failUrl !== null) {
-            $params['FailURL'] = $this->failUrl;
-        }
-        if ($this->receipt !== null) {
-            $params['Receipt'] = $this->receipt->toArray();
-        }
-        if ($this->data !== []) {
-            $params['DATA'] = $this->data;
-        }
-
-        return $params;
+        return $this->filterNulls([
+            'Amount'          => $this->amount,
+            'OrderId'         => $this->orderId,
+            'Description'     => $this->description,
+            'CustomerKey'     => $this->customerKey,
+            'Recurrent'       => $this->recurrent ? 'Y' : null,
+            'PayType'         => $this->payType?->value,
+            'Language'        => $this->language?->value,
+            'NotificationURL' => $this->notificationUrl,
+            'SuccessURL'      => $this->successUrl,
+            'FailURL'         => $this->failUrl,
+            'Receipt'         => $this->receipt?->toArray(),
+            'DATA'            => $this->data !== [] ? $this->data : null,
+        ]);
     }
 }

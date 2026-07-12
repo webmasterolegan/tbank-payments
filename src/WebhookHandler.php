@@ -34,8 +34,15 @@ final class WebhookHandler
     public function handle(array|string $payload): WebhookNotificationDto
     {
         if (is_string($payload)) {
-            /** @var array<string, mixed> $payload */
-            $payload = json_decode($payload, true, 512, JSON_THROW_ON_ERROR);
+            try {
+                /** @var array<string, mixed> $payload */
+                $payload = json_decode($payload, true, 512, JSON_THROW_ON_ERROR);
+            } catch (\JsonException $e) {
+                throw new InvalidWebhookSignatureException(
+                    'Invalid webhook payload: malformed JSON.',
+                    previous: $e,
+                );
+            }
         }
 
         $receivedToken = ($payload['Token'] ?? null) |> ApiValueParser::asString(...);

@@ -7,7 +7,7 @@ namespace TBank\Payments\DTO\Request;
 use TBank\Payments\DTO\Shared\ReceiptDto;
 
 /** Запрос SendClosingReceipt — закрывающий чек. */
-final readonly class SendReceiptRequestDto
+final readonly class SendReceiptRequestDto extends BaseRequestDto
 {
     public function __construct(
         public string $paymentId,

@@ -43,7 +43,7 @@ final class HttpClient implements HttpClientContract
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_CONNECTTIMEOUT => $this->connectTimeout,
             CURLOPT_TIMEOUT        => $this->timeout,
-            CURLOPT_SSLVERSION     => CURL_SSLVERSION_TLSv1_2,
+            CURLOPT_SSLVERSION     => CURL_SSLVERSION_TLSv1_2 | CURL_SSLVERSION_MAX_DEFAULT,
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_SSL_VERIFYHOST => 2,
             CURLOPT_HTTPHEADER     => [

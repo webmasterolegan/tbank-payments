@@ -7,7 +7,7 @@ namespace TBank\Payments\DTO\Request;
 use TBank\Payments\Enum\QrDataTypeEnum;
 
 /** Запрос AddAccountQr — привязка счёта покупателя через СБП. */
-final readonly class AddAccountQrRequestDto
+final readonly class AddAccountQrRequestDto extends BaseRequestDto
 {
     /**
      * @param array<string, string> $data Дополнительные параметры (DATA).
@@ -22,18 +22,11 @@ final readonly class AddAccountQrRequestDto
     /** @return array<string, mixed> */
     public function toArray(): array
     {
-        $params = [
-            'Description' => $this->description,
-            'DataType'    => $this->dataType->value,
-        ];
-
-        if ($this->data !== []) {
-            $params['DATA'] = $this->data;
-        }
-        if ($this->redirectDueDate !== null) {
-            $params['RedirectDueDate'] = $this->redirectDueDate;
-        }
-
-        return $params;
+        return $this->filterNulls([
+            'Description'     => $this->description,
+            'DataType'        => $this->dataType->value,
+            'DATA'            => $this->data !== [] ? $this->data : null,
+            'RedirectDueDate' => $this->redirectDueDate,
+        ]);
     }
 }
