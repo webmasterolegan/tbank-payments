@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TBank\Payments;
 
 use TBank\Payments\DTO\WebhookNotificationDto;
-use TBank\Payments\Exceptions\InvalidWebhookSignatureException;
+use TBank\Payments\Exceptions\{InvalidWebhookPayloadException, InvalidWebhookSignatureException};
 use TBank\Payments\Support\ApiValueParser;
 
 /**
@@ -28,6 +28,7 @@ final class WebhookHandler
      *
      * @param array<string, mixed>|string $payload JSON-строка или уже декодированный массив.
      *
+     * @throws InvalidWebhookPayloadException Если payload — битый JSON.
      * @throws InvalidWebhookSignatureException Если подпись не совпадает.
      */
     #[\NoDiscard]
@@ -38,7 +39,7 @@ final class WebhookHandler
                 /** @var array<string, mixed> $payload */
                 $payload = json_decode($payload, true, 512, JSON_THROW_ON_ERROR);
             } catch (\JsonException $e) {
-                throw new InvalidWebhookSignatureException(
+                throw new InvalidWebhookPayloadException(
                     'Invalid webhook payload: malformed JSON.',
                     previous: $e,
                 );

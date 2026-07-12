@@ -7,7 +7,7 @@ namespace TBank\Payments\Tests\Unit;
 use PHPUnit\Framework\TestCase;
 use TBank\Payments\DTO\WebhookNotificationDto;
 use TBank\Payments\Enum\PaymentStatusEnum;
-use TBank\Payments\Exceptions\InvalidWebhookSignatureException;
+use TBank\Payments\Exceptions\{InvalidWebhookPayloadException, InvalidWebhookSignatureException};
 use TBank\Payments\TokenGenerator;
 use TBank\Payments\WebhookHandler;
 
@@ -108,6 +108,14 @@ final class WebhookHandlerTest extends TestCase
         $this->expectException(InvalidWebhookSignatureException::class);
 
         (void) $handler->handle($payload);
+    }
+
+    public function testMalformedJsonThrowsPayloadException(): void
+    {
+        $this->expectException(InvalidWebhookPayloadException::class);
+        $this->expectExceptionMessage('malformed JSON');
+
+        (void) $this->handler->handle('{not-json');
     }
 
     public function testUnknownStatusMapsToUnknownEnum(): void

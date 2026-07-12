@@ -61,6 +61,17 @@ final class RetryingHttpClientTest extends TestCase
         $this->assertCount(1, $http->requests);
     }
 
+    public function testBackoffDelayGrowsExponentially(): void
+    {
+        $delays = [];
+
+        for ($attempt = 1; $attempt <= 3; $attempt++) {
+            $delays[] = (int) (200 * 1000 * (2 ** ($attempt - 1)));
+        }
+
+        $this->assertSame([200_000, 400_000, 800_000], $delays);
+    }
+
     public function testClientWrapsHttpClientWhenRetryAttemptsSet(): void
     {
         $attempts = 0;

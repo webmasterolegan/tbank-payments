@@ -25,7 +25,7 @@ final readonly class AddAccountQrRequestDto extends BaseRequestDto
         return $this->filterNulls([
             'Description'     => $this->description,
             'DataType'        => $this->dataType->value,
-            'DATA'            => $this->data !== [] ? $this->data : null,
+            'DATA'            => $this->omitIfEmpty($this->data),
             'RedirectDueDate' => $this->redirectDueDate,
         ]);
     }

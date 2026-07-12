@@ -10,6 +10,7 @@ use TBank\Payments\Exceptions\NetworkException;
  * Декоратор HTTP-клиента с повторными попытками при сетевых ошибках.
  *
  * Повторяет только {@see NetworkException}; ошибки API (success=false) не ретраятся.
+ * Задержка между попытками растёт экспоненциально: delayMs × 2^(attempt − 1).
  */
 final class RetryingHttpClient implements HttpClientContract
 {

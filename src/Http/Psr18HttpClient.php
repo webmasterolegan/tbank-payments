@@ -49,13 +49,10 @@ final class Psr18HttpClient implements HttpClientContract
             );
         }
 
-        $httpCode = $response->getStatusCode();
-        $raw      = (string) $response->getBody();
-
-        if ($httpCode < 200 || $httpCode >= 300) {
-            throw JsonResponseParser::httpError($httpCode, $response->getReasonPhrase(), $url);
-        }
-
-        return JsonResponseParser::parse($raw, $httpCode);
+        return JsonResponseParser::parse(
+            (string) $response->getBody(),
+            $response->getStatusCode(),
+            $url,
+        );
     }
 }

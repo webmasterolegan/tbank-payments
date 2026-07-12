@@ -74,27 +74,6 @@ final class ApiValueParser
         return null;
     }
 
-    public static function asNullableInt(mixed $value): ?int
-    {
-        if ($value === null) {
-            return null;
-        }
-
-        if (is_int($value)) {
-            return $value;
-        }
-
-        if (is_float($value)) {
-            return (int) $value;
-        }
-
-        if (is_string($value) && is_numeric($value)) {
-            return (int) $value;
-        }
-
-        return null;
-    }
-
     public static function asPaymentStatus(mixed $value): PaymentStatusEnum
     {
         return PaymentStatusEnum::tryFrom(self::asString($value)) ?? PaymentStatusEnum::Unknown;

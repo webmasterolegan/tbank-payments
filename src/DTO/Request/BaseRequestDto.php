@@ -26,4 +26,15 @@ abstract readonly class BaseRequestDto
     {
         return array_filter($map, static fn(mixed $v) => $v !== null);
     }
+
+    /**
+     * Возвращает null для пустого массива — чтобы опциональные DATA не уходили в API.
+     *
+     * @param array<string, mixed>|null $value
+     * @return array<string, mixed>|null
+     */
+    protected function omitIfEmpty(?array $value): ?array
+    {
+        return ($value === null || $value === []) ? null : $value;
+    }
 }

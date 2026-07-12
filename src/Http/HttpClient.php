@@ -68,7 +68,7 @@ final class HttpClient implements HttpClientContract
             throw JsonResponseParser::networkError($errno, $error, $url);
         }
 
-        return JsonResponseParser::parse((string) $raw, $httpCode);
+        return JsonResponseParser::parse((string) $raw, $httpCode, $url);
     }
 
     private function persistentShare(): CurlSharePersistentHandle

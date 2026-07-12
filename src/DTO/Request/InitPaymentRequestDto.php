@@ -47,7 +47,7 @@ final readonly class InitPaymentRequestDto extends BaseRequestDto
             'SuccessURL'      => $this->successUrl,
             'FailURL'         => $this->failUrl,
             'Receipt'         => $this->receipt?->toArray(),
-            'DATA'            => $this->data !== [] ? $this->data : null,
+            'DATA'            => $this->omitIfEmpty($this->data),
         ]);
     }
 }

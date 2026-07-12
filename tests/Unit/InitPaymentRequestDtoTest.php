@@ -36,4 +36,30 @@ final class InitPaymentRequestDtoTest extends TestCase
         $this->assertArrayHasKey('Receipt', $params);
         $this->assertArrayNotHasKey('ReceiptDto', $params);
     }
+
+    public function testOmitsOptionalFields(): void
+    {
+        $params = (new InitPaymentRequestDto(
+            amount : 10000,
+            orderId: 'order-1',
+        ))->toArray();
+
+        $this->assertSame(['Amount' => 10000, 'OrderId' => 'order-1'], $params);
+    }
+
+    public function testRecurrentSendsYOnlyWhenTrue(): void
+    {
+        $withRecurrent = (new InitPaymentRequestDto(amount: 100, orderId: 'o', recurrent: true))->toArray();
+        $withoutRecurrent = (new InitPaymentRequestDto(amount: 100, orderId: 'o'))->toArray();
+
+        $this->assertSame('Y', $withRecurrent['Recurrent']);
+        $this->assertArrayNotHasKey('Recurrent', $withoutRecurrent);
+    }
+
+    public function testEmptyDataIsOmitted(): void
+    {
+        $params = (new InitPaymentRequestDto(amount: 100, orderId: 'o', data: []))->toArray();
+
+        $this->assertArrayNotHasKey('DATA', $params);
+    }
 }
