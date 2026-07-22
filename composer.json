@@ -1,9 +1,10 @@
 {
     "name": "webmasterolegan/tbank-payments",
     "description": "PHP 8.5+ SDK для работы с API интернет-эквайринга T-Bank (Тинькофф)",
+    "version": "0.9.1",
     "type": "library",
     "license": "MIT",
-    "keywords": ["tbank", "tinkoff", "payments", "acquiring", "sdk"],
+    "keywords": ["tbank", "tinkoff", "payments", "acquiring", "sdk", "api", "integration"],
     "authors": [
         {
             "name": "Oleg Polyakov",
