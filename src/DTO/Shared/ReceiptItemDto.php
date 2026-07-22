@@ -27,6 +27,10 @@ final readonly class ReceiptItemDto
             throw new \InvalidArgumentException('Receipt item price must not be negative');
         }
 
+        if ($this->quantity <= 0) {
+            throw new \InvalidArgumentException('Receipt item quantity must be greater than zero');
+        }
+
         if ($this->amount < 0) {
             throw new \InvalidArgumentException('Receipt item amount must not be negative');
         }

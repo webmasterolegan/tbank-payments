@@ -125,4 +125,32 @@ final class ReceiptItemDtoTest extends TestCase
         $this->assertSame(0, $item->price);
         $this->assertSame(0, $item->amount);
     }
+
+    public function testRejectsZeroQuantity(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Receipt item quantity must be greater than zero');
+
+        new ReceiptItemDto(
+            name    : 'Товар',
+            price   : 100,
+            quantity: 0.0,
+            amount  : 0,
+            tax     : VatEnum::None,
+        );
+    }
+
+    public function testRejectsNegativeQuantity(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Receipt item quantity must be greater than zero');
+
+        new ReceiptItemDto(
+            name    : 'Товар',
+            price   : 100,
+            quantity: -1.0,
+            amount  : 100,
+            tax     : VatEnum::None,
+        );
+    }
 }
