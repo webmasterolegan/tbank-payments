@@ -28,10 +28,10 @@ abstract readonly class BaseRequestDto
     }
 
     /**
-     * Возвращает null для пустого массива — чтобы опциональные DATA не уходили в API.
+     * Возвращает null для пустого массива — чтобы опциональные DATA/Shops не уходили в API.
      *
-     * @param array<string, mixed>|null $value
-     * @return array<string, mixed>|null
+     * @param array<mixed>|null $value
+     * @return array<mixed>|null
      */
     protected function omitIfEmpty(?array $value): ?array
     {

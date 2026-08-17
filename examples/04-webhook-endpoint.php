@@ -14,7 +14,7 @@ declare(strict_types=1);
 require __DIR__ . '/bootstrap.php';
 
 use TBank\Payments\Enum\PaymentStatusEnum;
-use TBank\Payments\Exceptions\InvalidWebhookSignatureException;
+use TBank\Payments\Exceptions\{InvalidWebhookPayloadException, InvalidWebhookSignatureException};
 use TBank\Payments\TokenGenerator;
 use TBank\Payments\WebhookHandler;
 
@@ -63,6 +63,9 @@ try {
 } catch (InvalidWebhookSignatureException) {
     http_response_code(400);
     echo 'Bad signature';
+} catch (InvalidWebhookPayloadException) {
+    http_response_code(400);
+    echo 'Bad payload';
 } catch (Throwable $e) {
     http_response_code(500);
     error_log($e->getMessage());

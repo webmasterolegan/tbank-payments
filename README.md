@@ -29,7 +29,7 @@ PHP 8.5+ SDK для работы с API интернет-эквайринга **
 composer require webmasterolegan/tbank-payments
 ```
 
-**Требования:** PHP ≥ 8.5, расширения `curl`, `json`, `uri`.
+**Требования:** PHP ≥ 8.5, расширения `curl`, `json`, `mbstring`, `uri`.
 
 ---
 
@@ -83,6 +83,30 @@ if ($response->hasPaymentUrl()) {
     header('Location: ' . $response->paymentUrl);
     exit;
 }
+```
+
+Для маркетплейса передайте `Shops`: сумма каждого магазина в копейках и комиссия (`Fee`), которая удерживается из возмещения партнёра. Если `Fee` не указан, банк возьмёт комиссию из настроек регистрации.
+
+```php
+use TBank\Payments\DTO\Shared\ShopDto;
+
+$request = new InitPaymentRequestDto(
+    amount : 150000,
+    orderId: 'order-2024-001',
+    shops  : [
+        new ShopDto(
+            shopCode: '10001',
+            amount  : 100000,
+            name    : 'Футболка синяя',
+            fee     : 2500,
+        ),
+        new ShopDto(
+            shopCode: '10002',
+            amount  : 50000,
+            name    : 'Доставка',
+        ),
+    ],
+);
 ```
 
 ### 2. Подтвердить двухстадийное списание
@@ -158,13 +182,12 @@ $init = $client->payment()->init($request);
 
 ```php
 use TBank\Payments\Enum\{NotificationTypeEnum, PaymentStatusEnum};
-use TBank\Payments\Exceptions\InvalidWebhookSignatureException;
-use TBank\Payments\TBankClient;
+use TBank\Payments\Exceptions\{InvalidWebhookPayloadException, InvalidWebhookSignatureException};
 
 $handler = $client->webhookHandler();
 
 try {
-    $notification = $handler->handle(file_get_contents('php://input'));
+    $notification = $handler->handle(file_get_contents('php://input') ?: '');
 
     if (!$notification->success) {
         http_response_code(200);
@@ -192,6 +215,9 @@ try {
 } catch (InvalidWebhookSignatureException) {
     http_response_code(400);
     echo 'Bad signature';
+} catch (InvalidWebhookPayloadException) {
+    http_response_code(400);
+    echo 'Bad payload';
 }
 ```
 
@@ -419,7 +445,7 @@ $client = new TBankClient(
     terminalKey      : 'YOUR_TERMINAL_KEY',
     password         : 'YOUR_PASSWORD',
     retryAttempts    : 3,    // до 3 попыток при NetworkException
-    retryDelayMs     : 200,  // экспоненциальная задержка: 200, 400, 600 мс
+    retryDelayMs     : 200,  // экспоненциальная задержка: 200, 400, 800… мс
     connectTimeout   : 10,   // таймаут установки соединения (сек)
     reuseConnection  : true, // persistent cURL share (FrankenPHP, RoadRunner)
 );
@@ -464,7 +490,7 @@ $client = new TBankClient(
 );
 ```
 
-Без обёртки — только cURL:
+PSR-18 без retry-обёртки:
 
 ```php
 use TBank\Payments\Http\Psr18HttpClient;
@@ -515,6 +541,7 @@ export TBANK_ENV=production   # или test
 | `14-sbp-bank-list.php` | Список банков СБП |
 | `15-resend.php` | Повторная отправка уведомлений |
 | `16-sbp-account-binding.php` | Привязка счёта + автоплатёж СБП |
+| `17-marketplace-shops.php` | Init с Shops и комиссией маркетплейса |
 
 ```bash
 composer install
@@ -540,6 +567,10 @@ src/
 │   ├── LanguageEnum.php
 │   ├── CardCheckTypeEnum.php
 │   ├── EnvironmentEnum.php
+│   ├── NotificationTypeEnum.php
+│   ├── QrDataTypeEnum.php
+│   ├── DeviceTypeEnum.php
+│   ├── AccountQrStatusEnum.php
 │   ├── Fiscal/              # TaxationEnum, VatEnum, PaymentObjectEnum, …
 │   └── Card/                # CardStatusEnum, CardTypeEnum
 ├── Api/
@@ -552,12 +583,15 @@ src/
 │   ├── HttpClient.php
 │   ├── HttpClientContract.php
 │   ├── RetryingHttpClient.php
-│   └── Psr18HttpClient.php
+│   ├── Psr18HttpClient.php
+│   └── JsonResponseParser.php
+├── Support/                 # ApiUrlBuilder, ApiValueParser
 └── Exceptions/
     ├── TBankException.php
     ├── ApiException.php
     ├── NetworkException.php
-    └── InvalidWebhookSignatureException.php
+    ├── InvalidWebhookSignatureException.php
+    └── InvalidWebhookPayloadException.php
 ```
 
 ---
@@ -565,7 +599,7 @@ src/
 ## Обработка ошибок
 
 ```php
-use TBank\Payments\Exceptions\{ApiException, InvalidWebhookSignatureException, NetworkException, TBankException};
+use TBank\Payments\Exceptions\{ApiException, NetworkException, TBankException};
 
 try {
     $response = $client->payment()->init($request);

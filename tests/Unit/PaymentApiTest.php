@@ -6,6 +6,7 @@ namespace TBank\Payments\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use TBank\Payments\DTO\Request\InitPaymentRequestDto;
+use TBank\Payments\DTO\Shared\ShopDto;
 use TBank\Payments\Enum\PaymentStatusEnum;
 use TBank\Payments\TBankClient;
 use TBank\Payments\Tests\Support\FakeHttpClient;
@@ -53,6 +54,54 @@ final class PaymentApiTest extends TestCase
         $this->assertSame(PaymentStatusEnum::New, $response->status);
         $this->assertSame('999', $response->paymentId);
         $this->assertTrue($response->hasPaymentUrl());
+    }
+
+    public function testInitSendsShopsWithoutIncludingThemInToken(): void
+    {
+        $http = new FakeHttpClient([
+            'Success'     => true,
+            'TerminalKey' => 'TERM',
+            'Status'      => 'NEW',
+            'PaymentId'   => '999',
+            'OrderId'     => 'order-1',
+            'Amount'      => 150000,
+        ]);
+
+        $client = new TBankClient(
+            terminalKey: 'TERM',
+            password   : 'secret',
+            httpClient : $http,
+        );
+
+        (void) $client->payment()->init(
+            new InitPaymentRequestDto(
+                amount : 150000,
+                orderId: 'order-1',
+                shops  : [
+                    new ShopDto(
+                        shopCode: '10001',
+                        amount  : 150000,
+                        fee     : 2500,
+                    ),
+                ],
+            ),
+        );
+
+        $payload = $http->requests[0]['payload'];
+        $this->assertSame([
+            [
+                'ShopCode' => '10001',
+                'Amount'   => 150000,
+                'Fee'      => '2500',
+            ],
+        ], $payload['Shops']);
+
+        $expectedToken = (new TokenGenerator('secret'))->generate([
+            'Amount'      => 150000,
+            'OrderId'     => 'order-1',
+            'TerminalKey' => 'TERM',
+        ]);
+        $this->assertSame($expectedToken, $payload['Token']);
     }
 
     public function testInitMapsUnknownStatusToUnknownEnum(): void

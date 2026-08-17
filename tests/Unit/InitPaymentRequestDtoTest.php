@@ -6,7 +6,7 @@ namespace TBank\Payments\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use TBank\Payments\DTO\Request\InitPaymentRequestDto;
-use TBank\Payments\DTO\Shared\{ReceiptDto, ReceiptItemDto};
+use TBank\Payments\DTO\Shared\{ReceiptDto, ReceiptItemDto, ShopDto};
 use TBank\Payments\Enum\Fiscal\{TaxationEnum, VatEnum};
 
 final class InitPaymentRequestDtoTest extends TestCase
@@ -61,5 +61,45 @@ final class InitPaymentRequestDtoTest extends TestCase
         $params = (new InitPaymentRequestDto(amount: 100, orderId: 'o', data: []))->toArray();
 
         $this->assertArrayNotHasKey('DATA', $params);
+    }
+
+    public function testEmptyShopsAreOmitted(): void
+    {
+        $params = (new InitPaymentRequestDto(amount: 100, orderId: 'o', shops: []))->toArray();
+
+        $this->assertArrayNotHasKey('Shops', $params);
+    }
+
+    public function testShopsSerializedWithApiFieldNames(): void
+    {
+        $params = (new InitPaymentRequestDto(
+            amount : 150000,
+            orderId: 'order-1',
+            shops  : [
+                new ShopDto(
+                    shopCode: '10001',
+                    amount  : 100000,
+                    name    : 'Футболка синяя',
+                    fee     : 2500,
+                ),
+                new ShopDto(
+                    shopCode: '10002',
+                    amount  : 50000,
+                ),
+            ],
+        ))->toArray();
+
+        $this->assertSame([
+            [
+                'ShopCode' => '10001',
+                'Amount'   => 100000,
+                'Name'     => 'Футболка синяя',
+                'Fee'      => '2500',
+            ],
+            [
+                'ShopCode' => '10002',
+                'Amount'   => 50000,
+            ],
+        ], $params['Shops']);
     }
 }

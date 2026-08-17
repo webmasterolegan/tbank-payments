@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TBank\Payments\DTO\Request;
 
-use TBank\Payments\DTO\Shared\ReceiptDto;
+use TBank\Payments\DTO\Shared\{ReceiptDto, ShopDto};
 use TBank\Payments\Enum\{LanguageEnum, PayTypeEnum};
 
 /**
@@ -16,6 +16,7 @@ final readonly class InitPaymentRequestDto extends BaseRequestDto
 {
     /**
      * @param array<string,string> $data Дополнительные данные (DATA).
+     * @param ShopDto[] $shops Данные маркетплейса (Shops). Обязательно для маркетплейсов.
      */
     public function __construct(
         public int $amount,
@@ -30,6 +31,7 @@ final readonly class InitPaymentRequestDto extends BaseRequestDto
         public ?string $failUrl = null,
         public ?ReceiptDto $receipt = null,
         public array $data = [],
+        public array $shops = [],
     ) {}
 
     /** @return array<string, mixed> */
@@ -48,6 +50,10 @@ final readonly class InitPaymentRequestDto extends BaseRequestDto
             'FailURL'         => $this->failUrl,
             'Receipt'         => $this->receipt?->toArray(),
             'DATA'            => $this->omitIfEmpty($this->data),
+            'Shops'           => $this->omitIfEmpty(array_map(
+                static fn(ShopDto $shop): array => $shop->toArray(),
+                $this->shops,
+            )),
         ]);
     }
 }

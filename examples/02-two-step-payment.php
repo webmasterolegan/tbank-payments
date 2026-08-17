@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * Пример: двухстадийный платёж (Init → Confirm).
  *
- * 1. Init с PayType::TwoStep — холдирование средств.
+ * 1. Init с PayTypeEnum::TwoStep — холдирование средств.
  * 2. Confirm — списание после отгрузки товара.
  *
  * Запуск:
